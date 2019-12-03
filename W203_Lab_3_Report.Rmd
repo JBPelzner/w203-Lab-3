@@ -1,0 +1,105 @@
+---
+title: "Analyzing Determinants of Crime"
+author: "Rowan Cassius, Michael Steckler, Julian Pelzner"
+date: "12/3/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+### Introduction
+
+Understanding what causes crime is an age-long question that is well studied in in economic literature. This report aims to contriute to the discussion through an analysis of crime rates of counties in North Carolina in 1987. The data we have analyzed contains information about crime rates and various socioeconomic, geographic and demographic factors at the county level for 91 of North Carolina's 100 counties.
+
+Through our analysis we seek to understand the effective increased penalization is at combating crime and how large an effect a county's physical environment has on the amount of crime it experiences.
+
+### Data Cleaning
+
+```{r, echo = FALSE}
+# Dependencies
+library("stargazer")
+library("car")
+library("ggplot2")
+
+# Loading Data
+crime <- read.csv('crime_v2.csv')
+```
+
+```{r, echo=FALSE, results='hide'}
+# Exploration:
+# Missing value summary
+summary(is.na(crime))
+# Examining missing Values
+crime[91:nrow(crime), ]
+paste0("Number of missing values in first 92 rows: ", sum(is.na(crime[1:91,])))
+# Variales Types Summary
+str(crime)
+```
+
+
+```{r, echo=FALSE, results='hide'}
+# Cleaning changes:
+
+# Omitting NAs
+crime <- na.omit(crime)
+
+# Casting factor as numeric
+crime$prbconv <- as.numeric(crime$prbconv)
+
+# Removing year and county identifiers
+crime <- crime[!names(crime) %in% c('year', 'county')]
+
+# Summary
+summary(crime)
+
+# Examining two of the probaility variables
+print('Probaility of arrest summary:')
+summary(crime$prbarr)
+print('Probability of conviction summary:')
+summary(crime$prbconv)
+
+# Casting proability of conviction as probability
+crime$prbconv <- 1.0/100 * crime$prbconv
+```
+
+```{r, fig.align='center', fig.height=2.75, fig.width=4, fig.cap="Distribution of Probility of Arrest", echo=TRUE}
+# Examining outlier in probability of arrest.
+#hist(crime$prbarr)
+ggplot(crime, aes(x=prbarr)) + 
+  geom_histogram(bins = 30) +
+  xlab("Probability of Arrest") +
+  ylab("Count")
+```
+By looking at the histogram of `prbarr`, the variables has one outlier at `r round(max(crime$prbarr), 2)`. This is puzzling as it suggest that the number of convictions in the associated county was greater then the number of arrest in 1987. Some plausible explantions for this apparent outlier include the following:
+
+* The number of convictions includes spillover from pervious years. That is, the number of convictions includes convictions from 1986 and before while the number of arrests only includes arrests from 1987.
+
+* The number of convictions includes spillover from neighoring counties. That is, some criminals were arrested in neighboring counties and tried in this county of interest, thus letting the apparent number of convictions exceed the apparent number of arrests.
+
+* The outlier is a mistranscription. The official who reported the figure meant to report `r 1 - round(max(crime$prbarr), 2)`.
+
+It while plausile, it is not safe to assume the outlier is a mistranscription, so we most stongly speculate that it is a result of spill over either from a different year or a different county, or both. All of the cases of spillover suggest that the observatio containing this outlier did not come from the underlying population we intend to study: counties which each report their own crime and crime-related information exclusively in the year of 1987. For this reason, we removed the observation containing this ourlier from the analysis.
+
+```{r, echo=FALSE}
+crime <- crime[crime$prbarr <= 1.0, ]
+```
+
+After these changes, the data are vetted and ready for analysis.
+
+### Exploratory Analysis
+
+In this analysis, we seek to understand the extent to which penalization and the environment interact with crime. It is necessary to choose variables representing all of the ceoncepts we wish to study. Among all the variables in the dataset we select `crmrte`, representing the number of crimes committed per person in a given county, as the dependent variable we use to measure crime. 
+
+We also select `prbarr`, representing the ratio of offenses to arrests, also known as the probability of arrest, as a proxy for measuring the counties effort to penalize crime on the street level. We hypothesize that an increased likelihood of arrest stifes crime rates, because if criminals are less likely to escape punishment after are commiting offenses, we argue that this will make them less inclined to commit the offense in the very first place. 
+
+The primary variable of interest for measuring a important environmental factor is `density`, representing the the number of people per square mile in a county. We hypothesize that higher population density leads to an increase in crime rate for main reasons:
+
+1. In a county with a higher population density, there are more vulnerable denizens per square mile for criminals to perpetrate crimes against than average.
+
+2. In counties with high population density, people are likey to me living in more confined spaces and are probably more easily irritated, thus making them more likely to act out through ciminal behavior.
+
+
+
+### Baseline Model
+
+
