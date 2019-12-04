@@ -7,19 +7,20 @@ output:
   html_document: default
 ---
 
-### Introduction
+## Introduction
 
 Understanding what causes crime is an age-long question that is well studied in in economic literature. This report aims to contriute to the discussion through an analysis of crime rates of counties in North Carolina in 1987. The data we have analyzed contains information about crime rates and various socioeconomic, geographic and demographic factors at the county level for 91 of North Carolina's 100 counties.
 
 Through our analysis we seek to understand the effective increased penalization is at combating crime and how large an effect a county's physical environment has on the amount of crime it experiences.
 
-### Data Cleaning
+## Data Cleaning
 
 ```{r, echo = FALSE}
 # Dependencies
 library("stargazer")
 library("car")
 library("ggplot2")
+library("gridExtra")
 
 # Loading Data
 crime <- read.csv('crime_v2.csv')
@@ -66,7 +67,7 @@ crime$prbconv <- 1.0/100 * crime$prbconv
 # Examining outlier in probability of arrest.
 #hist(crime$prbarr)
 ggplot(crime, aes(x=prbarr)) + 
-  geom_histogram(bins = 30) +
+  geom_histogram(bins = 20, fill = "dodgerblue4") +
   xlab("Probability of Arrest") +
   ylab("Count")
 ```
@@ -86,7 +87,7 @@ crime <- crime[crime$prbarr <= 1.0, ]
 
 After these changes, the data are vetted and ready for analysis.
 
-### Exploratory Analysis
+## Exploratory Analysis
 
 In this analysis, we seek to understand the extent to which penalization and the environment interact with crime. It is necessary to choose variables representing all of the ceoncepts we wish to study. Among all the variables in the dataset we select `crmrte`, representing the number of crimes committed per person in a given county, as the dependent variable we use to measure crime. 
 
@@ -98,8 +99,139 @@ The primary variable of interest for measuring a important environmental factor 
 
 2. In counties with high population density, people are likey to me living in more confined spaces and are probably more easily irritated, thus making them more likely to act out through ciminal behavior.
 
+In summary, the key explanatory variables in our baseline model will be probability of arrest and density. The next figure shows the marginal distributions of both key explanatory variables and of crime rate.
 
 
-### Baseline Model
+```{r, fig.align='center', fig.height=3, fig.width=9, fig.cap="Marginal Distributions of Crime Rate, Probability of Arrest and Density", echo=TRUE}
+# Crime histogram
+plot.crime = ggplot(crime, aes(x=crmrte)) + 
+  geom_histogram(bins = 20, fill = "red3") +
+  xlab("Crime Rate") +
+  ylab("Count") +
+  ggtitle("Crime Rate")
+
+# Arrest Probability histogram
+plot.arrest = ggplot(crime, aes(x=prbarr)) + 
+  geom_histogram(bins = 20, fill = "dodgerblue4") +
+  xlab("Probability of Arrest") +
+  ylab("") +
+  ggtitle("Probability of Arrest")
+
+# Density histogram
+plot.density = ggplot(crime, aes(x=density)) + 
+  geom_histogram(bins = 20, fill = "seagreen4") +
+  xlab("Density") +
+  ylab("") +
+  ggtitle("Density")
+
+grid.arrange(plot.crime, plot.arrest, plot.density, nrow = 1, ncol = 3)
+```
+
+Each distribution has some right skew and a couple outliers, but this is to be expected of complex data.
+
+
+```{r, fig.height=7, fig.width=7, fig.cap="Scatter Plots of Crime against Probability of Arrest and Density", echo=FALSE}
+
+p1 <- ggplot(crime, aes(x=prbarr, y=crmrte)) +
+  geom_point() +
+  geom_smooth(method="gam", color = "dodgerblue4", fill = "dodgerblue4") +
+  xlab("Probability of Arrest") +
+  ylab("Crime Rate") +
+  ggtitle("Crime Rate and Probability of Arrest")
+
+p2 <- ggplot(crime, aes(x=density, y=crmrte)) + 
+  geom_point() +
+  geom_smooth(method="gam", color = "seagreen4", fill = "seagreen4") +
+  xlab("Density") +
+  ylab("Crime Rate") +
+  ggtitle("Crime Rate and Density")
+
+p3 <- ggplot(crime, aes(x=prbarr, y=log(crmrte))) +
+  geom_point() +
+  geom_smooth(method="gam", color = "dodgerblue4", fill = "dodgerblue4") +
+  xlab("Probability of Arrest") +
+  ylab("Log-Crime Rate") +
+  ggtitle("Log-Crime Rate and Probability of Arrest")
+
+p4 <- ggplot(crime, aes(x=density, y=log(crmrte))) + 
+  geom_point() +
+  geom_smooth(method="gam", color = "seagreen4", fill = "seagreen4") +
+  xlab("Density") +
+  ylab("Log-Crime Rate") +
+  ggtitle("Log-Crime Rate and Density")
+
+grid.arrange(p1, p2, p3, p4, nrow = 2, ncol = 2)
+```
+
+The scatter plots above compare the scatter plots of crime rate with each primary explanatory variable and the scatter plots of log-crime rate with the same variables. It appears that the untransformed specifications have the strongest linear relationship with crime rate, so we will specifiy our baseline model without transforming crime rate. Refraining from transforming the response variable will enable us to directly interpret the model coefficients as the associated changes in crime rate for a single unit increase in each explanatory variable.
+
+The first scatter plot illustrates that likelihood of arrest has a negative correlation with crime rate, supporting our hypothesis that increasing crackdown on crime is associated with a lower crime rate. The second plot supports our second hpothesis that increases in popualation density are associated with increased crime rates. 
+
+## Baseline Model Specification. 
+
+$$
+crimrate = \beta_0 + \beta_1prbarr + \beta_2density + \epsilon
+$$
+```{r}
+model.1 <- lm(crmrte ~ prbarr + density, data=crime)
+```
+
+### Assessing CLM Assumptions
+
+1. **Linearity**
+
+* After our bivariate exploratory analyses of crime rate with probability of arrest and crime rate with density, we chose the specification offering relationships that appear linear. However, we can argue that the model is linear no matter what because we have not yet contrained $\epsilon$.
+
+2. **Random Sampling**
+
+* We can infer that because there are 97 data points, out of 100 possible counties in the state, that the researchers intended to complete a census of the population of counties in the state. However, because data from a few counties was inaccessible, they limited the study to a convenience sample of the remaining counties. Since over 5% of the population was sampled, we can not reasonably argue that the data was collected from a random sample. Nonetheless, with over 90% of counties in the state represented, we can conclude that the results of our models will offer useful insights into the causal factors behind crime rate on a statewide level. We assume that the inavailability of data in some counties is not connected to the crime rates therein in any significant way.
+
+3. **Multicollinearity** 
+
+* To test for multicollinearity, we have calculated the inflated variance factors for all of the regressors in the first model. The variance inflation factors for both probability of arrest and density are close to 1, so there is no problematic multicollinearity and, therefore, no perfect multicollinearity.
+
+```{r}
+round(car::vif(model.1), 2)
+```
+
+4. **Zero Conditional Mean**
+
+* To examine the zero conditional mean assumption, we have plotted the residuals as a function of the fitted values. By inspection of the residuals vs fitted values plot, there is not substantial evidence of violation of the zero conditional mean assumption. The conditional mean remains close to zero but tends downward slightly as the fitted values increase.
+
+```{r, fig.height=2.5, fig.width=3, fig.cap="Baseline Models Residuals vs Fitted Values Plot", echo=FALSE}
+ggplot(crime, aes(x=model.1$fitted.values, y=model.1$residuals)) +
+  geom_point() +
+  geom_smooth() +
+  xlab("Fitted Values") +
+  ylab("Residuals") +
+  ggtitle("Residuals vs Fitted Values")
+```
+
+5. **Heteroscadascity**
+
+* By examination of the residuals vs fitted values plot, there appears to some degree of heteroscedasticity because the magnitude of the residuals taper off at both the highest and lowest fitted values. To address this, we will use heteroscedasticty robust standard errors when making inferences.
+
+6. **Normality of Errors**
+
+* By inspection of the residuals' normal Q-Q plot and their distribution, the error distribution suffers from a fat right tail and a short left tail. While there this means the error distribution deviates from normality somewhat, the sample size of `r nrow(crime)`, which is far greater than 30, enables us to confidently invoke the central limit theorem and conclude that in spite of the errors' non-normality, we still approximate the sampling distributions of the model's coefficients.
+
+```{r, fig.height=3.5, fig.width=7, fig.cap="Residuals' distribution and Normal Q-Q Plot", echo=TRUE}
+residual <- data.frame(model.1$residuals)
+p.resid <- ggplot(residual, 
+                  aes(x=model.1.residuals)) +
+  geom_histogram(bins=20) +
+  xlab("Residual") +
+  ggtitle("Residual Histogram")
+q.resid <- ggplot(residual, aes(sample = model.1.residuals)) +
+  stat_qq() + 
+  stat_qq_line() +
+  ggtitle("Residual Q-Q Plot")
+
+grid.arrange(p.resid, q.resid, nrow = 1, ncol = 2)
+
+```
+
+
+
 
 
