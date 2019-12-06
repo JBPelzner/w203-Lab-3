@@ -11,7 +11,15 @@ output:
 
 Understanding what causes crime is an age-long question that is well studied in economic literature. This report aims to contribute to the discussion through an analysis of crime rates of counties in North Carolina in 1987. The data we analyze contains information about crime rates and various socioeconomic, geographic and demographic factors at the county level for 91 of North Carolina's 100 counties.
 
-Through our analysis we seek to understand how effective increased penalization is at combating crime and how large an effect a county's physical environment has on the amount of crime it experiences.
+This study was conducted for the reelection campaign of the Governor of North Carolina. Political consultants have identified crime as a primary voter initiative. Through our analysis we seek to understand how effective increased penalization is at combating crime and how the living conditions within a county affect instances of crime.
+
+In this report, we provide an analysis that illuminates the determinants of crime, and we suggest policy actions that can be implemented at the local government level. The report is structured as follows:
+
+1. First, we check for any holes in the data and clean the dataset accordingly. 
+2. Next we perform an exploratory analysis of the variables which we reason are the strongest proxies for the concepts we wish to study. This is then followed by fitting a baseline regression model and evaluating all classical linear model assumptions.
+3. Then, we fit several more regression models to control for ommitted variables and examine the robustness of the baseline results.
+4. Lastly, we generate policy suggestions according to our findings.
+
 
 ## Data Cleaning
 
@@ -100,17 +108,17 @@ crime <- crime[crime$prbarr <= 1.0, ]
 
 ### Variable Selection
 
-In this analysis, we seek to understand the extent to which penalizing criminal activity and the environmental factors interact with crime. It is necessary to choose variables representing all of the concepts we wish to study. Among all the variables in the dataset we select `crmrte`, representing the number of crimes committed per person in a given county, as the dependent variable used to measure crime. We also select `prbarr`, representing the ratio of offenses to arrests, also known as the probability of arrest, as a proxy for measuring counties' efforts to penalize crime on the street level. 
+In this analysis, we seek to understand the extent to which penalizing criminal activity and living conditions interact with crime. It is necessary to choose variables representing all of the concepts we wish to study. Among all the variables in the dataset we select `crmrte`, representing the number of crimes committed per person in a given county, as the dependent variable used to measure crime. We also select `prbarr`, representing the ratio of offenses to arrests, also known as the probability of arrest, as a proxy for measuring counties' efforts to penalize crime on the street level. 
 
-While there are other variables in the data which can argualy proxy counties' efforts to penalize crime, such as the probability of conviction (after arrest), the probability of imprisonment (after conviction), and the average prison sentence length, we choose probability of arrest because it is the most tangible form of penalty among all those available and the also first to betide an offender. Apprehsion is a county's immediate response to a criminal's offense and is necessary before the criminal can experince any other ensuing forms of penalty. Additionally, because prison sentence is a metric only based on crimes serious enough to warrant imprisonment, it does not reflect a county's effort to penalize all crimes but only the most serious subset of them. Therefore, we consider the probability of arrest to be the strongest proxy for crime penalization that is most likely to deter a criminal from committing an offense.
+While there are other variables in the data which can argualy proxy counties' efforts to penalize crime, such as the probability of conviction (after arrest), the probability of imprisonment (after conviction), and the average prison sentence length, we choose probability of arrest because it is the most tangible form of penalty among all those available and the also first to betide an offender. Apprehsion is a county's immediate response to a criminal's offense and is necessary before the criminal can experince any other ensuing forms of penalty. Additionally, because prison sentence is a metric only based on crimes serious enough to warrant imprisonment, it does not reflect a county's effort to penalize all crimes but only the most serious subset of them. Therefore, we consider the probability of arrest to be the strongest proxy for crime penalization that is most likely to deter a criminal from committing an offense. In addition, a higher probability of arrest could indicate that the police are more effective at detaining people who commit crimes in the county.
 
 Moreover, We hypothesize that an increased likelihood of arrest stifes crime rates, because if criminals are less likely to escape punishment after are commiting offenses, we argue that this will make them less inclined to commit the offense in the very first place. 
 
-The variable of interest we identify for measuring a important environmental factor is `density`, representing the the number of people per square mile in a county. We hypothesize that higher population density leads to an increase in crime rate for two main reasons:
+The variable of interest we identify as most relevant to it's living conditions is `density`, representing the the number of people per square mile in a county. We hypothesize that higher population density leads to an increase in crime rate for two main reasons:
 
 1. In a county with a high population density, there are more vulnerable denizens per square mile for criminals to perpetrate crimes against than there there are in a county with lower density.
 
-2. In counties with high population density, people are likey to be living in more confined spaces and are probably more easily irritated, thus making them more likely to act out through ciminal behavior.
+2. Prior research suggests that denser areas tend to make people more irritable due to increased economic competition and lack living comfortability, thus making it's people more likely to act out through ciminal behavior.
 
 In summary, the key explanatory variables in our baseline model will be probability of arrest and density. The next figure shows the marginal distributions of crime rate and both key explanatory variables.
 
@@ -120,23 +128,17 @@ In summary, the key explanatory variables in our baseline model will be probabil
 # Crime histogram
 plot.crime = ggplot(crime, aes(x=crmrte)) + 
   geom_histogram(bins = 20, fill = "red3") +
-  xlab("Crime Rate") +
-  ylab("Count") +
-  ggtitle("Crime Rate")
+  xlab("Crime Rate") + ylab("Count") + ggtitle("Crime Rate")
 
 # Arrest Probability histogram
 plot.arrest = ggplot(crime, aes(x=prbarr)) + 
   geom_histogram(bins = 20, fill = "dodgerblue4") +
-  xlab("Probability of Arrest") +
-  ylab("") +
-  ggtitle("Probability of Arrest")
+  xlab("Probability of Arrest") + ylab("") + ggtitle("Probability of Arrest")
 
 # Density histogram
 plot.density = ggplot(crime, aes(x=density)) + 
   geom_histogram(bins = 20, fill = "seagreen4") +
-  xlab("Density") +
-  ylab("") +
-  ggtitle("Density")
+  xlab("Density") + ylab("") + ggtitle("Density")
 
 grid.arrange(plot.crime, plot.arrest, plot.density, nrow = 1, ncol = 3)
 ```
@@ -231,7 +233,7 @@ ggplot(crime, aes(x=model.1$fitted.values, y=model.1$residuals)) +
 
 6. **Normality of Errors**
 
-> By inspection of the residuals' normal Q-Q plot and their distribution, the error distribution suffers from a fat right tail and a short left tail. While there this means the error distribution deviates from normality somewhat, the sample size of `r nrow(crime)`, which is far greater than 30, enables us to confidently invoke the central limit theorem and conclude that in spite of the errors' non-normality, we approximate the sampling distributions of the model's coefficients.
+> By inspection of the residuals' normal Q-Q plot and their distribution, the error distribution suffers from a fat right tail and a short left tail. While this means the error distribution deviates from normality somewhat, the sample size of `r nrow(crime)`, which is far greater than 30, enables us to confidently invoke the central limit theorem and conclude that in spite of the errors' non-normality, we approximate the sampling distributions of the model's coefficients.
 
 ```{r, fig.height=3.5, fig.width=7, fig.cap="Residuals' distribution and Normal Q-Q Plot", echo=TRUE}
 residual <- data.frame(model.1$residuals)
@@ -249,15 +251,75 @@ grid.arrange(p.resid, q.resid, nrow = 1, ncol = 2)
 
 ```
 
+### Model Results
+- Both key expanatory variables are significant at what levels
+- interpret coefficients
+- 
+
+### Plausible Omitted Variables
+
+$$ 
+response = \beta_{interest} interest + \beta_{omitted}omitted\\
+omitted = \delta_{interest} interest + ... \\
+sign(bias) =  sign(\beta_{omitted} \times \delta_{interest}) 
+$$
+Plausible ommitted vaiables that may bias the effect of density include:
+
+* Whether a county is urban
+  + Urban localities are known for having crime rates than suburban and rural areas and they are also more dense. Therefore the omission of this variable is likley to have biased the effect of density on crime rate upward from zero. Because `urban` is an indicator variable in the dataset for whether a county is urban, we can control for this omitted variable directly by including urban in subsequent regression models.
+* Economic inequality 
+  + Economic inequlity is likely to be positively correlated with both crime rate and desnity. Therefore the omission of this variable has most likely inflated the postive effect of density on crime rate. In the absence of a metric for economic disparity such as a gini coefficient, we can mitigate the bias from this omitted variable by including variables descibing other economic conditions.
+* Social Cohesion.
+  +
+* Geographic region
+
+Plausible ommitted vaiables that may bias the effect of probability of arrest include:
+
+* Police presence
+  + We speculate that police presence on the street is likely to be negatively correlated with crime rate, but positively correlated with the probability of arrest. This speculation suggests that omitting police presence has inflated the negative effect of the probability of arrest on crime rate by pushing the coefficient away from zero. We can control for police presence by including the police per capital variable in subsequent models.
+* 
+
+
+
+
+Our first OVB concern stems from the density variable, which is an imperfect proxy for living conditions. Density fails to capture other potential determinants of crime that are associated with dense regions, such as economic inequality and social cohesion. However, metrics for these concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include gini coefficients, level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. These concerns are relevant for our following models as well. 
+
+
 \newpage
 
 ### Model 2 Specifcation
 
+
 $$
-Y = \beta_0 + \beta^T X + \gamma^T Z + \epsilon
+Y = \beta_0 +\beta^T X + \gamma^T Z + \epsilon
 $$
 
-where,
+
+```{r, echo=FALSE}
+vars.2 <- c('crmrte', 'prbarr', 'density', 'polpc', 'urban')
+crime.2 <- crime[, vars.2]
+model.2 <- lm(crmrte ~ ., data = crime.2)
+```
+
+### Model 3 Specifcation
+
+* wage stuff
+* geographic stuff
+* demographic stuff
+
+$$
+Y = \beta_0 +\beta^T X + \gamma^T Z + \theta^TW + \epsilon
+$$
+
+where W are the following columns of the dataset pertaining to wage geography and demogaphics:
+```{r, echo=FALSE}
+vars.3 <- c(vars.2, "taxpc", "west", "central", "pctmin80", "wcon", 
+            "wtuc", "wtrd", "wfir", "wser", "wmfg", "wfed", "wsta", "wloc", 
+            "mix", "pctymle")
+crime.3 <- crime[, vars.3]
+model.3 <- lm(crmrte ~ ., data = crime.3)
+```
+
 
 $$
 Y = crimerate, \space
@@ -269,78 +331,104 @@ density
 \text{ , }
 Z = 
 \begin{bmatrix}
-polpc\\
 urban\\
-wfed
+polpc
 \end{bmatrix}^T
 $$
 
-
-```{r}
-vars.2 <- c('crmrte', 'prbarr', 'density', 'polpc', 'urban', 'wfed')
-crime.2 <- crime[, vars.2]
-model.2 <- lm(crmrte ~ ., data = crime.2)
-```
 
 \newpage
 
 ## Regression Summaries
 ```{r, echo=FALSE}
 # Knitr cannot process latex output so the latex is below this cell
-# stargazer(model.1, model.2,
-#           type = "html",
+# stargazer(model.1, model.2, model.3,
+#           type = "latex",
 #           omit.stat = "f",
-#           se = list(sqrt(diag(sandwich::vcovHC(model.1)))),
+#           se = list(sqrt(diag(sandwich::vcovHC(model.1))),
+#                     sqrt(diag(sandwich::vcovHC(model.2))),
+#                     sqrt(diag(sandwich::vcovHC(model.3)))),
 #           star.cutoffs = c(0.05, 0.01, 0.001))
 ```
 
 \begin{table}[!htbp] \centering 
   \caption{} 
   \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\begin{tabular}{@{\extracolsep{5pt}}lccc} 
 \\[-1.8ex]\hline 
 \hline \\[-1.8ex] 
- & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
-\cline{2-3} 
-\\[-1.8ex] & \multicolumn{2}{c}{crmrte} \\ 
-\\[-1.8ex] & (1) & (2)\\ 
+ & \multicolumn{3}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{3}{c}{crmrte} \\ 
+\\[-1.8ex] & (1) & (2) & (3)\\ 
 \hline \\[-1.8ex] 
- prbarr & $-$0.028$^{*}$ & $-$0.027$^{*}$ \\ 
-  & (0.012) & (0.012) \\ 
-  & & \\ 
- density & 0.008$^{***}$ & 0.006$^{***}$ \\ 
-  & (0.001) & (0.002) \\ 
-  & & \\ 
- polpc &  & 7.707$^{***}$ \\ 
-  &  & (2.228) \\ 
-  & & \\ 
- urban &  & 0.005 \\ 
-  &  & (0.008) \\ 
-  & & \\ 
- wfed &  & 0.00002 \\ 
-  &  & (0.00003) \\ 
-  & & \\ 
- Constant & 0.030$^{***}$ & 0.010 \\ 
-  & (0.005) & (0.012) \\ 
-  & & \\ 
+ prbarr & $-$0.028$^{*}$ & $-$0.028$^{*}$ & $-$0.036$^{*}$ \\ 
+  & (0.012) & (0.013) & (0.016) \\ 
+  & & & \\ 
+ density & 0.008$^{***}$ & 0.006$^{***}$ & 0.007$^{***}$ \\ 
+  & (0.001) & (0.002) & (0.002) \\ 
+  & & & \\ 
+ polpc &  & 7.832 & 3.902 \\ 
+  &  & (5.649) & (7.751) \\ 
+  & & & \\ 
+ urban &  & 0.005 & $-$0.002 \\ 
+  &  & (0.010) & (0.010) \\ 
+  & & & \\ 
+ taxpc &  &  & 0.0003 \\ 
+  &  &  & (0.0004) \\ 
+  & & & \\ 
+ west &  &  & $-$0.0004 \\ 
+  &  &  & (0.007) \\ 
+  & & & \\ 
+ central &  &  & $-$0.002 \\ 
+  &  &  & (0.005) \\ 
+  & & & \\ 
+ pctmin80 &  &  & 0.0003 \\ 
+  &  &  & (0.0002) \\ 
+  & & & \\ 
+ wcon &  &  & 0.00002 \\ 
+  &  &  & (0.00004) \\ 
+  & & & \\ 
+ wtuc &  &  & 0.00001 \\ 
+  &  &  & (0.00002) \\ 
+  & & & \\ 
+ wtrd &  &  & 0.0001 \\ 
+  &  &  & (0.0001) \\ 
+  & & & \\ 
+ wfir &  &  & $-$0.0001 \\ 
+  &  &  & (0.00004) \\ 
+  & & & \\ 
+ wser &  &  & $-$0.00001 \\ 
+  &  &  & (0.0001) \\ 
+  & & & \\ 
+ wmfg &  &  & $-$0.00000 \\ 
+  &  &  & (0.00002) \\ 
+  & & & \\ 
+ wfed &  &  & 0.00005 \\ 
+  &  &  & (0.00005) \\ 
+  & & & \\ 
+ wsta &  &  & 0.00000 \\ 
+  &  &  & (0.0001) \\ 
+  & & & \\ 
+ wloc &  &  & 0.00002 \\ 
+  &  &  & (0.0001) \\ 
+  & & & \\ 
+ mix &  &  & 0.002 \\ 
+  &  &  & (0.022) \\ 
+  & & & \\ 
+ pctymle &  &  & 0.168$^{*}$ \\ 
+  &  &  & (0.076) \\ 
+  & & & \\ 
+ Constant & 0.030$^{***}$ & 0.019$^{*}$ & $-$0.024 \\ 
+  & (0.005) & (0.008) & (0.035) \\ 
+  & & & \\ 
 \hline \\[-1.8ex] 
-Observations & 90 & 90 \\ 
-R$^{2}$ & 0.554 & 0.616 \\ 
-Adjusted R$^{2}$ & 0.543 & 0.593 \\ 
-Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 84) \\ 
+Observations & 90 & 90 & 90 \\ 
+R$^{2}$ & 0.554 & 0.613 & 0.789 \\ 
+Adjusted R$^{2}$ & 0.543 & 0.594 & 0.732 \\ 
+Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 85) & 0.010 (df = 70) \\ 
 \hline 
 \hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
+\textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
 \end{tabular} 
 \end{table}
-
-
-
-
-
-
-
-
-
-
-
