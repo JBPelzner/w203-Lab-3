@@ -306,9 +306,15 @@ polpc
 $$
 
 
+## Regression Summaries
+
+We produce a stargazer table in the section below (Table 1) to display the results of our three regressions model. The key findings of this table can be described as follows:
+The baseline model exhibits an adjusted R^2 of 0.543. Both key explanatory variables are statistically significant: density is statistically significant at the 0.1% level, and prbarr is statistically significant at the 5% level. According to our baseline model, a 1% increase in density is expected to result in a .008 unit increase in the county’s crime rate, on average. A .8% increase in the county’s crime rate is fairly small in magnitude, and hence we believe this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. A roughly 3% decrease in the county’s crime rate is fairly noteworthy, and hence we believe this result is practically significant. 
+The second model exhibits an adjusted R^2 of 0.594. Both key explanatory variables are statistically significant at the same levels as the baseline model. The standard errors for these variables increased slightly, although these increases are negligible. According to this second model, a 1% increase in density is expected to result in a .006 unit increase in the county’s crime rate, on average. A .6% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we believe this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. This is consistent with our baseline model, and further confirms our models’ external validity, as well as the practical significance of this particular result. Although the coefficient for polpc is large in magnitude, neither of our additional regressors are statistically significant. We therefore believe that the results associated with these additional regressors are not statistically significant.
+The third model exhibits an adjusted R^2 of 0.732. Both key explanatory variables are still statistically significant at the same levels as the baseline model. The standard error for prbarr increased slightly, although the increase is negligible. The standard error for density is equal to that of our second model. In addition, pctymle is statistically significant at the 5% level. According to this third model, a 1% increase in density is expected to result in a .007 unit increase in the county’s crime rate, on average. A .7% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we believe this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .036 unit decrease in the county’s crime rate, on average. This result is slightly larger than our baseline model, and could be exaggerated due to the higher standard error associated with this coefficient. Nevertheless, this further confirms our models’ external validity, as well as the practical significance of this particular result. A one unit increase in pctymle is expected to result in a .168 unit increase in the crime rate, on average. A 16.8% increase in the crime rate is considerably large in magnitude. As such, we believe it is practically significant. Besides pctymle, none of the other additional regressors associated with the third model are statistically significant. We therefore believe that the results associated with these additional regressors are not practically significant either. 
+
 \newpage
 
-## Regression Summaries
 ```{r, echo=FALSE}
 # Knitr cannot process latex output so the latex is below this cell
 # stargazer(model.1, model.2, model.3,
@@ -375,12 +381,22 @@ Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 85) & 0.010 (df = 70) \\
 \newpage
 
 ### Recommendations
+We recommend that the governor should collaborate with the state and local governments and their police departments to enact and implement a stop-and-frisk policy. This crime penalization policy would effectively provide police forces with the efficacy to increase the probability of arrest in their jurisdictions. Considering that this dataset provides evidence that a higher probability of arrest is related to a decrease in crime rates, we believe that the Governor can influence crime reduction statewide. Next steps involve consulting state, city, district attorney generals and police chiefs to craft a series of internal policies and bills that will support law enforcement in these efforts as much as possible. The governor should also rally support among statewide and citywide legislatures to ensure these laws can be passed and implemented in a timely fashion. 
+
+We also recommend that the governor fund more youth community building programs throughout the state. This policy is aimed as ameliorating issues associated with social cohesion, living conditions, and economic opportunity.
+
+
+
+More tangibly, this policy would involve increasing police supervision and reforming criminal law to be .
 
 
 ### Conclusion
+This study explores the determinants of crime. Across all three model specifications, we consistently observe that the probability of arrest is both statistically and practically significant in reducing crime rates. We also consistently observe that, to a lesser extent, lower county densities are statistically significant in having reduced crime rates. Interestingly, our third model revealed that the percent of youth males in a county is both statistically and practically significant in having lower crime rates. These results have the potential to inform policy action that can address crime head-on.
+
+Considering the balance between accuracy and parsimony, we believe our baseline model is best for interpretability. Informative for policy action.
 
 
-
+\newpage
 
 ### Appendix
 * Summary Statistics
