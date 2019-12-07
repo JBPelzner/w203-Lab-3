@@ -387,9 +387,6 @@ We also recommend that the governor fund more youth community building programs 
 
 
 
-More tangibly, this policy would involve increasing police supervision and reforming criminal law to be .
-
-
 ### Conclusion
 This study explores the determinants of crime. Across all three model specifications, we consistently observe that the probability of arrest is both statistically and practically significant in reducing crime rates. We also consistently observe that, to a lesser extent, lower county densities are statistically significant in having reduced crime rates. Interestingly, our third model revealed that the percent of youth males in a county is both statistically and practically significant in having lower crime rates. These results have the potential to inform policy action that can address crime head-on.
 
