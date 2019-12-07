@@ -238,7 +238,7 @@ Plausible ommitted vaiables that may bias the effect of density include:
 * Economic inequality 
   + Economic inequlity is likely to be positively correlated with both crime rate and desnity. Therefore the omission of this variable has most likely inflated the postive effect of density on crime rate. In the absence of a metric for economic disparity such as a gini coefficient, we can mitigate the bias from this omitted variable by including variables descibing other economic conditions, such as the various wage variables and tax per capita variable that are provided in the given dataset.
 * Social Cohesion.
-  + Social cohesion is likely to be negatively correlated with density. In other words, denser areas may experience higher rates of social unrest. Further, the competition between neighbors in denser areas can cause distrust and social unrest. In addition, social cohesion is likely to be negatively correlated with crime rate. We expect that the more cohesive a society (county) is, the lower its crime rate will be. However, metrics for this concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. 
+  + Social cohesion is likely to be negatively correlated with density. In other words, denser areas may experience higher rates of competition, which can cause distrust and social unrest.In addition, social cohesion is likely to be negatively correlated with crime rate. We expect that the more cohesive a society (county) is, the lower its crime rate will be. Thus, the omission of this variable is likely to have biased the effect of density on crime rate upwards away from zero.  However, metrics for this concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. 
 * Geographic region
   + Fortunately, there exists west and central dummy variables, which proxy geographic regions in North Carolina. As such, we include these variables in our third model.
 
@@ -246,7 +246,8 @@ Plausible ommitted vaiables that may bias the effect of probability of arrest in
 
 * Police presence
   + We speculate that police presence on the street is likely to be negatively correlated with crime rate, but positively correlated with the probability of arrest. This speculation suggests that omitting police presence has inflated the negative effect of the probability of arrest on crime rate by pushing the coefficient away from zero. We can control for police presence by including the police per capital variable in subsequent models.
-* 
+* Harshness of police fore
+  + We believe that the harshness of a county's police force is negatively correlated with the crime rate in that county and positively correlated with the probability of arrest in that county. Therefore, omission of this variable from our model would suggest that the effect of probability of arrest on crime rate is biased downwards away from zero. Metrics for this concept do not exist in the given dataset either. Useful metrics could include rate of violent arrests and the degree to which police are armed with weapons. To that end, future work should strive to collect more data on these metrics.  
 
 
 
