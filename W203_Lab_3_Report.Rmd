@@ -184,9 +184,9 @@ grid.arrange(p1, p2, p3, p4, nrow = 2, ncol = 2)
 
 \vspace{6pt}
 
-The scatter plots above compare the scatter plots of crime rate with each primary explanatory variable and the scatter plots of log-crime rate with the same variables. It appears that the untransformed specifications have the strongest linear relationship with crime rate, so we will specifiy our baseline model without transforming crime rate. Refraining from transforming the response variable will enable us to directly interpret the model coefficients as the associated changes in crime rate for a single unit increase in each explanatory variable.
+The scatter plots above compare the scatter plots of crime rate with each primary explanatory variable and the scatter plots of log-crime rate with the same variables. It appears that the untransformed specifications have the strongest linear relationship with crime rate, so we will specifiy our baseline model without transforming crime rate. Refraining from transforming the response variable will enable us to directly interpret the model coefficients as the associated changes in crime rate for a single unit increases in each explanatory variable.
 
-The first scatter plot illustrates that likelihood of arrest has a negative correlation with crime rate, supporting our hypothesis that increasing crackdown on crime is associated with a lower crime rate. The second plot supports our second hpothesis that increases in popualation density are associated with increased crime rates. 
+The first scatter plot illustrates that likelihood of arrest has a negative correlation with crime rate, supporting our hypothesis that increasing crackdown on crime is associated with a lower crime rate. The second plot supports our second hpothesis that increases in popualation density are associated with increases in crime rate. In order to understand the effects of probaility of arrest and density on crime rate more precisely, we will perform a regression analysis, regressing crime rate on both explanatory variables using the specification below.
 
 ## Baseline Model Specification. 
 
@@ -204,7 +204,7 @@ model.1 <- lm(crmrte ~ prbarr + density, data=crime)
 
 1. **Linearity**
 
-> After our bivariate exploratory analyses of crime rate with probability of arrest and crime rate with density, we chose the specification offering relationships that appear linear. However, we can argue that the model is linear no matter what because we have not yet contrained $\epsilon$.
+> After our bivariate exploratory analyses of crime rate with probability of arrest and crime rate with density, we chose the specification offering relationships that appear linear. However, we can also argue that the model is linear regardless of the model specification because we have not yet contrained $\epsilon$.
 
 2. **Random Sampling**
 
@@ -252,9 +252,11 @@ grid.arrange(p.resid, q.resid, nrow = 1, ncol = 2)
 ```
 
 ### Model Results
-- Both key expanatory variables are significant at what levels
-- interpret coefficients
-- 
+The baseline regression analysis suggests that both probability of arrest and density both have significant effects on crime at the 5% and 0.1% significant levels respectively, with coefficients $-0.028$ and $0.008$ respectively. 
+
+The first coefficient suggests that in a county of $N$ residents, a 10% increase in the probaility of arrest is associated with a $0.1 \times 0.028 \times N$ reduction in the number of crimes the county experiences per year. For example in a county of 100,000, a 10% increase in the chance of arrest is expected to reduce the number of crimes the county experiences by `r 0.1*100000*0.028`, which would be a welcome outcome to county residents. 
+
+Similary, density's coefficient of 0.008 suggests that in the same county as the one described above, de-densifying the county by 10 people per square mile will reduce reduce the number of crime in the county by `r 10*0.008*100000`! While both initial results are exciting, we are careful not to recommend policies based on these results exclusively because the regressors are likely endogeneous to some degree and their effects on crime may be the artifacts of omitted variables.
 
 ### Plausible Omitted Variables
 
@@ -296,9 +298,14 @@ $$
 
 
 ```{r, echo=FALSE}
-vars.2 <- c('crmrte', 'prbarr', 'density', 'polpc', 'urban')
+vars.2 <- c('crmrte', 'prbarr', 'density', 'polpc', 'urban', 'mix')
 crime.2 <- crime[, vars.2]
 model.2 <- lm(crmrte ~ ., data = crime.2)
+
+vars.3 <- c(vars.2, "taxpc","pctmin80", "pctymle", "west", "central", "wfed", 
+            "wcon", "wtuc", "wtrd", "wfir", "wser", "wmfg", "wsta", "wloc")
+crime.3 <- crime[, vars.3]
+model.3 <- lm(crmrte ~ ., data = crime.3)
 ```
 
 ### Model 3 Specifcation
@@ -313,9 +320,8 @@ $$
 
 where W are the following columns of the dataset pertaining to wage geography and demogaphics:
 ```{r, echo=FALSE}
-vars.3 <- c(vars.2, "taxpc", "west", "central", "pctmin80", "wcon", 
-            "wtuc", "wtrd", "wfir", "wser", "wmfg", "wfed", "wsta", "wloc", 
-            "mix", "pctymle")
+vars.3 <- c(vars.2, "taxpc","pctmin80", "pctymle", "west", "central", "wfed", 
+            "wcon", "wtuc", "wtrd", "wfir", "wser", "wmfg", "wsta", "wloc")
 crime.3 <- crime[, vars.3]
 model.3 <- lm(crmrte ~ ., data = crime.3)
 ```
@@ -342,14 +348,26 @@ $$
 ## Regression Summaries
 ```{r, echo=FALSE}
 # Knitr cannot process latex output so the latex is below this cell
-# stargazer(model.1, model.2, model.3,
-#           type = "latex",
-#           omit.stat = "f",
-#           se = list(sqrt(diag(sandwich::vcovHC(model.1))),
-#                     sqrt(diag(sandwich::vcovHC(model.2))),
-#                     sqrt(diag(sandwich::vcovHC(model.3)))),
-#           star.cutoffs = c(0.05, 0.01, 0.001))
+# Uncomment this stargazer command and run command manually to reproduce results
+
+stargazer(model.1, model.2, model.3,
+          type = "latex",
+          omit.stat = "f",
+          se = list(sqrt(diag(sandwich::vcovHC(model.1))),
+                    sqrt(diag(sandwich::vcovHC(model.2))),
+                    sqrt(diag(sandwich::vcovHC(model.3)))),
+          star.cutoffs = c(0.05, 0.01, 0.001))
+
+# Calculating gooness of fit metrics for each model
+aic <- round(c(AIC(model.1), AIC(model.2), AIC(model.3)), 2)
+bic <- round(c(BIC(model.1), BIC(model.2), BIC(model.3)), 2)
 ```
+
+
+
+
+
+
 
 \begin{table}[!htbp] \centering 
   \caption{} 
@@ -362,20 +380,29 @@ $$
 \\[-1.8ex] & \multicolumn{3}{c}{crmrte} \\ 
 \\[-1.8ex] & (1) & (2) & (3)\\ 
 \hline \\[-1.8ex] 
- prbarr & $-$0.028$^{*}$ & $-$0.028$^{*}$ & $-$0.036$^{*}$ \\ 
-  & (0.012) & (0.013) & (0.016) \\ 
+ prbarr & $-$0.028$^{*}$ & $-$0.029$^{*}$ & $-$0.036$^{*}$ \\ 
+  & (0.012) & (0.014) & (0.016) \\ 
   & & & \\ 
  density & 0.008$^{***}$ & 0.006$^{***}$ & 0.007$^{***}$ \\ 
   & (0.001) & (0.002) & (0.002) \\ 
   & & & \\ 
- polpc &  & 7.832 & 3.902 \\ 
-  &  & (5.649) & (7.751) \\ 
+ polpc &  & 7.788 & 3.902 \\ 
+  &  & (5.817) & (7.751) \\ 
   & & & \\ 
  urban &  & 0.005 & $-$0.002 \\ 
   &  & (0.010) & (0.010) \\ 
   & & & \\ 
+ mix &  & 0.002 & 0.002 \\ 
+  &  & (0.018) & (0.022) \\ 
+  & & & \\ 
  taxpc &  &  & 0.0003 \\ 
   &  &  & (0.0004) \\ 
+  & & & \\ 
+ pctmin80 &  &  & 0.0003 \\ 
+  &  &  & (0.0002) \\ 
+  & & & \\ 
+ pctymle &  &  & 0.168$^{*}$ \\ 
+  &  &  & (0.076) \\ 
   & & & \\ 
  west &  &  & $-$0.0004 \\ 
   &  &  & (0.007) \\ 
@@ -383,8 +410,8 @@ $$
  central &  &  & $-$0.002 \\ 
   &  &  & (0.005) \\ 
   & & & \\ 
- pctmin80 &  &  & 0.0003 \\ 
-  &  &  & (0.0002) \\ 
+ wfed &  &  & 0.00005 \\ 
+  &  &  & (0.00005) \\ 
   & & & \\ 
  wcon &  &  & 0.00002 \\ 
   &  &  & (0.00004) \\ 
@@ -404,20 +431,11 @@ $$
  wmfg &  &  & $-$0.00000 \\ 
   &  &  & (0.00002) \\ 
   & & & \\ 
- wfed &  &  & 0.00005 \\ 
-  &  &  & (0.00005) \\ 
-  & & & \\ 
  wsta &  &  & 0.00000 \\ 
   &  &  & (0.0001) \\ 
   & & & \\ 
  wloc &  &  & 0.00002 \\ 
   &  &  & (0.0001) \\ 
-  & & & \\ 
- mix &  &  & 0.002 \\ 
-  &  &  & (0.022) \\ 
-  & & & \\ 
- pctymle &  &  & 0.168$^{*}$ \\ 
-  &  &  & (0.076) \\ 
   & & & \\ 
  Constant & 0.030$^{***}$ & 0.019$^{*}$ & $-$0.024 \\ 
   & (0.005) & (0.008) & (0.035) \\ 
@@ -425,10 +443,63 @@ $$
 \hline \\[-1.8ex] 
 Observations & 90 & 90 & 90 \\ 
 R$^{2}$ & 0.554 & 0.613 & 0.789 \\ 
-Adjusted R$^{2}$ & 0.543 & 0.594 & 0.732 \\ 
-Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 85) & 0.010 (df = 70) \\ 
+Adjusted R$^{2}$ & 0.543 & 0.590 & 0.732 \\ 
+Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 84) & 0.010 (df = 70) \\ 
 \hline 
 \hline \\[-1.8ex] 
 \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
 \end{tabular} 
 \end{table}
+
+
+kjkjakdjfadkjfa;dkj
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{3}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{3}{c}{crmrte} \\ 
+\\[-1.8ex] & (1) & (2) & (3)\\ 
+\hline \\[-1.8ex] 
+ prbarr & $-$0.028$^{*}$ & $-$0.028$^{*}$ & $-$0.036 \\ 
+  & (0.012) & (0.013) & (0.019) \\ 
+  & & & \\ 
+ density & 0.008$^{***}$ & 0.006$^{***}$ & 0.007$^{***}$ \\ 
+  & (0.001) & (0.002) & (0.002) \\ 
+  & & & \\ 
+ polpc &  & 7.832 & 4.015 \\ 
+  &  & (5.649) & (7.177) \\ 
+  & & & \\ 
+ urban &  & 0.005 & $-$0.002 \\ 
+  &  & (0.010) & (0.010) \\ 
+  & & & \\ 
+ taxpc &  &  & 0.0003 \\ 
+  &  &  & (0.0004) \\ 
+  & & & \\ 
+ pctmin80 &  &  & 0.0003 \\ 
+  &  &  & (0.0002) \\ 
+  & & & \\ 
+ pctymle &  &  & 0.168$^{*}$ \\ 
+  &  &  & (0.075) \\ 
+  & & & \\ 
+\hline \\[-1.8ex]
+Geographic fixed effects & No & No & Yes \\
+Wages fixed effects & No & No & Yes \\
+\hline \\[-1.8ex] 
+Observations & 90 & 90 & 90 \\ 
+R$^{2}$ & 0.554 & 0.613 & 0.789 \\ 
+AIC & `r aic[1]` & `r aic[2]` & `r aic[3]` \\
+BIC & `r bic[1]` & `r bic[2]` & `r bic[3]` \\
+Adjusted R$^{2}$ & 0.543 & 0.594 & 0.736 \\ 
+Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 85) & 0.010 (df = 71) \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.05; $^{**}$p$<$0.01; $^{***}$p$<$0.001} \\ 
+\end{tabular} 
+\end{table}
+
+
