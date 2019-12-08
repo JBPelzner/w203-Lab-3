@@ -252,14 +252,13 @@ Endogeneity of probability of arrest:
 * Harshness of police force
   + We reason that the harshness of a county's police force is negatively correlated with the crime rate in that county and positively correlated with the probability of arrest in that county. Therefore, omission of this variable from our model would suggest that the effect of probability of arrest on crime rate is biased downwards away from zero. Metrics for this concept do not exist in the given dataset either. Useful metrics could include rate of violent arrests and the degree to which police are armed with weapons. To that end, future work should strive to collect more data on these metrics.  
 * Proportion of face-to-face crimes
-  + In this context, we are thinking about variety of offenses in the sense that some counties may have a mix of offenses which contain a higher proportion of personal or face-to-face crimes than others. We theorize that the proportion of face-to-face crimes is positively correlated with probability of arrest, because these crimes are generally more serious in nature and could provide victims with descriptions of suspects that can be utilized by the police. Additionally, we reason that proportion of face-to-face crimes is positively correlated with crime rate. Therefore, omission of this variable would lead to the effect of probability of arrest on crime rate being pushed upwards towards zero.
+  + In this context, we are thinking about variety of offenses in the sense that some counties may have a mix of offenses which contain a higher proportion of personal or face-to-face crimes than others. We theorize that the proportion of face-to-face crimes is positively correlated with probability of arrest, because these crimes are generally more serious in nature and could provide victims with descriptions of suspects that can be utilized by the police. Additionally, we reason that proportion of face-to-face crimes is positively correlated with crime rate. Therefore, omission of this variable would lead to the effect of probability of arrest on crime rate being pushed upwards towards zero. In the dataset, we have the variable `mix`, which directly represents the proportion of face-to-face offenses in the dataset.
 
 
 ### Future Model Specifications
 * To combat the biases that may have arisen from omitting the aforementioned variables, we will proceed by fitting new models with some variables to mitigate these potential biases. After inclusion of additional explanatory regressors, we will evaluate how the effects of the key variables we identified in our basline model have changed and whether or not they are still statistically significant.
-* In our first subsequent model iteration, we only include the variables which we believe would contribute the most to a mitigation of omitted variable bias. These variables include the urban indicator variable, `urban`, the police per capita metric variable, `polpc`. We also choose to include the variable `pctymle`
-* Then, a following iteration of our model includes controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`.
-* Lastly, a final iteration of our model controls for economic conditions by including wage variables and the tax per capita variable, `taxpc`.
+* In our first subsequent model iteration, we only include the variables which we believe would contribute the most to a mitigation of omitted variable bias. These variables include the urban indicator variable, `urban`, the police per capita metric variable, `polpc`, as well as the offense mix proportion variable, `mix`.
+* Then, a following iteration of our model includes controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`. Additionally, this iteration of our model controls for economic conditions by including wage variables and the tax per capita variable, `taxpc`. Furthermore, we decide to include the variable `pctymle`, which describes the percentage of young males under the age of 24 that reside in a given county, because young men are the most likely candidates for committing crimes.
 
 \newpage
 
@@ -319,10 +318,16 @@ $$
 
 Again, we reference the stargazer table below (Table 1) to display the results of our regression models. After expanding our baseline model, the key findings of this table can be described as follows:
 
-The baseline model exhibits an adjusted R^2 of 0.543. Both key explanatory variables are statistically significant: density is statistically significant at the 0.1% level, and prbarr is statistically significant at the 5% level. According to our baseline model, a 1% increase in density is expected to result in a .008 unit increase in the county’s crime rate, on average. A .8% increase in the county’s crime rate is fairly small in magnitude, and hence we reason this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. A roughly 3% decrease in the county’s crime rate is fairly noteworthy, and hence we reason this result is practically significant. 
+Because characteristics of the regressors were not assigned randomly to the counties in the dataset, we can not definitively conclude that these variables were the true causes of any observed differences in crime rates. However, the coefficients are robust against many plausible omitted variables, which provides evidence for a strong causal link.
 
-The second model exhibits an adjusted R^2 of 0.594. Both key explanatory variables are statistically significant at the same levels as the baseline model. The standard errors for these variables increased slightly, although these increases are negligible. According to this second model, a 1% increase in density is expected to result in a .006 unit increase in the county’s crime rate, on average. A .6% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we reason this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. This is consistent with our baseline model, and further confirms our models’ external validity, as well as the practical significance of this particular result. Although the coefficient for polpc is large in magnitude, neither of our additional regressors are statistically significant. We therefore reason that the results associated with these additional regressors are not statistically significant.
-The third model exhibits an adjusted R^2 of 0.732. Both key explanatory variables are still statistically significant at the same levels as the baseline model. The standard error for prbarr increased slightly, although the increase is negligible. The standard error for density is equal to that of our second model. In addition, pctymle is statistically significant at the 5% level. According to this third model, a 1% increase in density is expected to result in a .007 unit increase in the county’s crime rate, on average. A .7% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we reason this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .036 unit decrease in the county’s crime rate, on average. This result is slightly larger than our baseline model, and could be exaggerated due to the higher standard error associated with this coefficient. Nevertheless, this further confirms our models’ external validity, as well as the practical significance of this particular result. A one unit increase in pctymle is expected to result in a .168 unit increase in the crime rate, on average. A 16.8% increase in the crime rate is considerably large in magnitude. As such, we reason it is practically significant. Besides pctymle, none of the other additional regressors associated with the third model are statistically significant. We therefore reason that the results associated with these additional regressors are not practically significant either. 
+The R^2 value increases for each specification, which is to be expected as we add more regressors. Additionally, the Adjusted R^2 value increases for each specification, which provides evidence the controls we introduced into our models accounted for some of the variation in our response variable and were important to control for. 
+
+Throughout all three specifications of our model, our key explanatory variables, `prbarr` and `density`, remain statistically significant and their coefficient estimates remain relatively stable. Therefore, the previous interpretation of the coefficients from our baseline model is still valid and we will generate policy recommendations with regards to those two key explanatory variables. 
+
+Furthermore, although the coefficient for `polpc` is large in magnitude, neither of our additional regressors in model 2 are statistically significant. We therefore reason that the results associated with these additional regressors are not practically significant. 
+
+It is also worth noting that when `pctymle` is included in the model, it shows to be significant at the 5% level. The coefficient for this regressor can be interpreted in the following way: a one unit increase in `pctymle` is expected to result in a .168 unit increase in the crime rate, on average. A 16.8% increase in the crime rate is considerably large in magnitude. As such, we reason it is practically significant. 
+Besides pctymle, none of the other additional regressors associated with the third model are statistically significant. We therefore reason that the results associated with these additional regressors are not practically significant either. Still, the significance of `pctymle` suggests that this variables is relevant to crime rates and should be taken into account when considering policy recommendations.
 
 \newpage
 
@@ -359,24 +364,15 @@ The third model exhibits an adjusted R^2 of 0.732. Both key explanatory variable
   & & & \\ 
  urban &  & 0.005 & $-$0.002 \\ 
   &  & (0.010) & (0.010) \\ 
-  & & & \\ 
- taxpc &  &  & 0.0003 \\ 
-  &  &  & (0.0004) \\ 
-  & & & \\ 
- west &  &  & $-$0.0004 \\ 
-  &  &  & (0.007) \\ 
-  & & & \\ 
- central &  &  & $-$0.002 \\ 
-  &  &  & (0.005) \\ 
-  & & & \\ 
+  & & & \\
+  mix &  & 0.002 & 0.002 \\
+  &  & (0.018) & (0.022) \\
+  & & & \\
  pctmin80 &  &  & 0.0003 \\ 
   &  &  & (0.0002) \\ 
   & & & \\ 
  pctymle &  &  & 0.168$^{*}$ \\ 
   &  &  & (0.076) \\ 
-  & & & \\ 
- Constant & 0.030$^{***}$ & 0.019$^{*}$ & $-$0.024 \\ 
-  & (0.005) & (0.008) & (0.035) \\ 
   & & & \\ 
 \hline \\[-1.8ex] 
 Observations & 90 & 90 & 90 \\ 
