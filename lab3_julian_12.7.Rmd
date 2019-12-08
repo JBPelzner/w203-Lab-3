@@ -218,11 +218,13 @@ model.1 <- lm(crmrte ~ prbarr + density, data=crime)
 
 
 ### Model Results
+--*see Table 1
+- talk about model 1 first:
 - Both key expanatory variables are significant at what levels
-- interpret coefficients
-- 
+- interpret coefficients & significance
+- discuss that they may be results of OVB
 
-### Plausible Omitted Variables
+### Assessing Exogeneity
 
 $$ 
 \begin{aligned}
@@ -231,29 +233,32 @@ omitted &= \delta_{interest} interest + ... \\
 sign(bias) &=  sign(\beta_{omitted} \times \delta_{interest}) 
 \end{aligned}
 $$
-Plausible ommitted vaiables that may bias the effect of density include:
+Endogeneity of density:
 
 * Whether a county is urban
   + Urban localities are known for having crime rates than suburban and rural areas and they are also more dense. Therefore the omission of this variable is likley to have biased the effect of density on crime rate upward from zero. Because `urban` is an indicator variable in the dataset for whether a county is urban, we can control for this omitted variable directly by including urban in subsequent regression models.
 * Economic inequality 
   + Economic inequlity is likely to be positively correlated with both crime rate and desnity. Therefore the omission of this variable has most likely inflated the postive effect of density on crime rate. In the absence of a metric for economic disparity such as a gini coefficient, we can mitigate the bias from this omitted variable by including variables descibing other economic conditions, such as the various wage variables and tax per capita variable that are provided in the given dataset.
 * Social Cohesion.
-  + Social cohesion is likely to be negatively correlated with density. In other words, denser areas may experience higher rates of competition, which can cause distrust and social unrest.In addition, social cohesion is likely to be negatively correlated with crime rate. We expect that the more cohesive a society (county) is, the lower its crime rate will be. Thus, the omission of this variable is likely to have biased the effect of density on crime rate upwards away from zero.  However, metrics for this concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. 
+  + Social cohesion is likely to be negatively correlated with density. In other words, denser areas may experience higher rates of competition, which can cause distrust and social unrest. In addition, social cohesion is likely to be negatively correlated with crime rate. We expect that the more cohesive a society (county) is, the lower its crime rate will be. Thus, the omission of this variable is likely to have biased the effect of density on crime rate upwards away from zero.  However, metrics for this concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. 
 * Geographic region
-  + Fortunately, there exists west and central dummy variables, which proxy geographic regions in North Carolina. As such, we include these variables in our third model.
+  + There may be varying levels of crime based on the region in North Carolina in which a county is located. It is difficult to postulate the sign of correlation between region and density, or between region and crime rate, and therefore it is difficult to postulate the direction of the bias from the omission of this variable. Nonetheless, it is a relevant concept which should be controlled for in our analysis. Fortunately, there exists west and central dummy variables, which proxy geographic regions in North Carolina. 
+  
 
-Plausible ommitted vaiables that may bias the effect of probability of arrest include:
+Endogeneity of probability of arrest:
 
 * Police presence
   + We speculate that police presence on the street is likely to be negatively correlated with crime rate, but positively correlated with the probability of arrest. This speculation suggests that omitting police presence has inflated the negative effect of the probability of arrest on crime rate by pushing the coefficient away from zero. We can control for police presence by including the police per capital variable in subsequent models.
-* Harshness of police fore
-  + We believe that the harshness of a county's police force is negatively correlated with the crime rate in that county and positively correlated with the probability of arrest in that county. Therefore, omission of this variable from our model would suggest that the effect of probability of arrest on crime rate is biased downwards away from zero. Metrics for this concept do not exist in the given dataset either. Useful metrics could include rate of violent arrests and the degree to which police are armed with weapons. To that end, future work should strive to collect more data on these metrics.  
+* Harshness of police force
+  + We reason that the harshness of a county's police force is negatively correlated with the crime rate in that county and positively correlated with the probability of arrest in that county. Therefore, omission of this variable from our model would suggest that the effect of probability of arrest on crime rate is biased downwards away from zero. Metrics for this concept do not exist in the given dataset either. Useful metrics could include rate of violent arrests and the degree to which police are armed with weapons. To that end, future work should strive to collect more data on these metrics.  
+* Proportion of face-to-face crimes
+  + In this context, we are thinking about variety of offenses in the sense that some counties may have a mix of offenses which contain a higher proportion of personal or face-to-face crimes than others. We theorize that the proportion of face-to-face crimes is positively correlated with probability of arrest, because these crimes are generally more serious in nature and could provide victims with descriptions of suspects that can be utilized by the police. Additionally, we reason that proportion of face-to-face crimes is positively correlated with crime rate. Therefore, omission of this variable would lead to the effect of probability of arrest on crime rate being pushed upwards towards zero.
 
 
-
-
-Our first OVB concern stems from the density variable, which is an imperfect proxy for living conditions. Density fails to capture other potential determinants of crime that are associated with dense regions, such as economic inequality and social cohesion. However, metrics for these concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include gini coefficients, level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. These concerns are relevant for our following models as well. 
-
+### Future Model Specifications
+* To combat the biases that may have arisen from omitting the aforementioned variables, we will proceed by fitting new models with some variables to mitigate these potential biases. After inclusion of additional explanatory regressors, we will evaluate how the effects of the key variables we identified in our basline model have changed and whether or not they are still statistically significant.
+* In our first subsequent model iteration, we only include the variables which we believe would contribute the most to a mitigation of omitted variable bias. These variables include the urban indicator variable `urban`, the police per capita metric variable `polpc`. We also choose to include the variable `pctymle`
+* Then, a following iteration of our model including controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`.
 
 \newpage
 
@@ -308,11 +313,15 @@ $$
 
 
 ## Regression Summaries
+--noting how key explanatory variables remain significant after adding regressors that are proxying for omitted variables
+  -- talk about coeffecient effects in the actual units which they represent (e.g. talk about crime rate in terms of crimes per people)
 
-We produce a stargazer table in the section below (Table 1) to display the results of our three regressions model. The key findings of this table can be described as follows:
-The baseline model exhibits an adjusted R^2 of 0.543. Both key explanatory variables are statistically significant: density is statistically significant at the 0.1% level, and prbarr is statistically significant at the 5% level. According to our baseline model, a 1% increase in density is expected to result in a .008 unit increase in the county’s crime rate, on average. A .8% increase in the county’s crime rate is fairly small in magnitude, and hence we believe this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. A roughly 3% decrease in the county’s crime rate is fairly noteworthy, and hence we believe this result is practically significant. 
-The second model exhibits an adjusted R^2 of 0.594. Both key explanatory variables are statistically significant at the same levels as the baseline model. The standard errors for these variables increased slightly, although these increases are negligible. According to this second model, a 1% increase in density is expected to result in a .006 unit increase in the county’s crime rate, on average. A .6% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we believe this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. This is consistent with our baseline model, and further confirms our models’ external validity, as well as the practical significance of this particular result. Although the coefficient for polpc is large in magnitude, neither of our additional regressors are statistically significant. We therefore believe that the results associated with these additional regressors are not statistically significant.
-The third model exhibits an adjusted R^2 of 0.732. Both key explanatory variables are still statistically significant at the same levels as the baseline model. The standard error for prbarr increased slightly, although the increase is negligible. The standard error for density is equal to that of our second model. In addition, pctymle is statistically significant at the 5% level. According to this third model, a 1% increase in density is expected to result in a .007 unit increase in the county’s crime rate, on average. A .7% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we believe this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .036 unit decrease in the county’s crime rate, on average. This result is slightly larger than our baseline model, and could be exaggerated due to the higher standard error associated with this coefficient. Nevertheless, this further confirms our models’ external validity, as well as the practical significance of this particular result. A one unit increase in pctymle is expected to result in a .168 unit increase in the crime rate, on average. A 16.8% increase in the crime rate is considerably large in magnitude. As such, we believe it is practically significant. Besides pctymle, none of the other additional regressors associated with the third model are statistically significant. We therefore believe that the results associated with these additional regressors are not practically significant either. 
+Again, we reference the stargazer table below (Table 1) to display the results of our regression models. After expanding our baseline model, the key findings of this table can be described as follows:
+
+The baseline model exhibits an adjusted R^2 of 0.543. Both key explanatory variables are statistically significant: density is statistically significant at the 0.1% level, and prbarr is statistically significant at the 5% level. According to our baseline model, a 1% increase in density is expected to result in a .008 unit increase in the county’s crime rate, on average. A .8% increase in the county’s crime rate is fairly small in magnitude, and hence we reason this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. A roughly 3% decrease in the county’s crime rate is fairly noteworthy, and hence we reason this result is practically significant. 
+
+The second model exhibits an adjusted R^2 of 0.594. Both key explanatory variables are statistically significant at the same levels as the baseline model. The standard errors for these variables increased slightly, although these increases are negligible. According to this second model, a 1% increase in density is expected to result in a .006 unit increase in the county’s crime rate, on average. A .6% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we reason this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .028 unit decrease in the county’s crime rate, on average. This is consistent with our baseline model, and further confirms our models’ external validity, as well as the practical significance of this particular result. Although the coefficient for polpc is large in magnitude, neither of our additional regressors are statistically significant. We therefore reason that the results associated with these additional regressors are not statistically significant.
+The third model exhibits an adjusted R^2 of 0.732. Both key explanatory variables are still statistically significant at the same levels as the baseline model. The standard error for prbarr increased slightly, although the increase is negligible. The standard error for density is equal to that of our second model. In addition, pctymle is statistically significant at the 5% level. According to this third model, a 1% increase in density is expected to result in a .007 unit increase in the county’s crime rate, on average. A .7% increase in the county’s crime rate is fairly small in magnitude, and smaller in magnitude compared to our baseline model. Hence we reason this result is not that practically significant. In addition, a 1 unit increase in prbarr is expected to result in a .036 unit decrease in the county’s crime rate, on average. This result is slightly larger than our baseline model, and could be exaggerated due to the higher standard error associated with this coefficient. Nevertheless, this further confirms our models’ external validity, as well as the practical significance of this particular result. A one unit increase in pctymle is expected to result in a .168 unit increase in the crime rate, on average. A 16.8% increase in the crime rate is considerably large in magnitude. As such, we reason it is practically significant. Besides pctymle, none of the other additional regressors associated with the third model are statistically significant. We therefore reason that the results associated with these additional regressors are not practically significant either. 
 
 \newpage
 
@@ -382,7 +391,7 @@ Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 85) & 0.010 (df = 70) \\
 \newpage
 
 ### Recommendations
-We recommend that the governor should collaborate with the state and local governments and their police departments to enact and implement a stop-and-frisk policy. This crime penalization policy would effectively provide police forces with the efficacy to increase the probability of arrest in their jurisdictions. Considering that this dataset provides evidence that a higher probability of arrest is related to a decrease in crime rates, we believe that the Governor can influence crime reduction statewide. Next steps involve consulting state, city, district attorney generals and police chiefs to craft a series of internal policies and bills that will support law enforcement in these efforts as much as possible. The governor should also rally support among statewide and citywide legislatures to ensure these laws can be passed and implemented in a timely fashion. 
+We recommend that the governor should collaborate with the state and local governments and their police departments to enact and implement a stop-and-frisk policy. This crime penalization policy would effectively provide police forces with the efficacy to increase the probability of arrest in their jurisdictions. Considering that this dataset provides evidence that a higher probability of arrest is related to a decrease in crime rates, we reason that the Governor can influence crime reduction statewide. Next steps involve consulting state, city, district attorney generals and police chiefs to craft a series of internal policies and bills that will support law enforcement in these efforts as much as possible. The governor should also rally support among statewide and citywide legislatures to ensure these laws can be passed and implemented in a timely fashion. 
 
 We also recommend that the governor fund more youth community building programs throughout the state. This policy is aimed as ameliorating issues associated with social cohesion, living conditions, and economic opportunity.
 
@@ -391,7 +400,7 @@ We also recommend that the governor fund more youth community building programs 
 ### Conclusion
 This study explores the determinants of crime. Across all three model specifications, we consistently observe that the probability of arrest is both statistically and practically significant in reducing crime rates. We also consistently observe that, to a lesser extent, lower county densities are statistically significant in having reduced crime rates. Interestingly, our third model revealed that the percent of youth males in a county is both statistically and practically significant in having lower crime rates. These results have the potential to inform policy action that can address crime head-on.
 
-Considering the balance between accuracy and parsimony, we believe our baseline model is best for interpretability. Informative for policy action.
+Considering the balance between accuracy and parsimony, we reason our baseline model is best for interpretability. Informative for policy action.
 
 
 \newpage
@@ -409,9 +418,69 @@ stargazer(crime[c('prbarr')])
 print('Probability of conviction summary:')
 stargazer(crime[c('prbconv')])
 ```
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Pctl(25)} & \multicolumn{1}{c}{Pctl(75)} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+county & 91 & 101.615 & 58.794 & 1.000 & 52.000 & 152.000 & 197.000 \\ 
+year & 91 & 87.000 & 0.000 & 87.000 & 87.000 & 87.000 & 87.000 \\ 
+crmrte & 91 & 0.033 & 0.019 & 0.006 & 0.021 & 0.040 & 0.099 \\ 
+prbarr & 91 & 0.295 & 0.137 & 0.093 & 0.206 & 0.344 & 1.091 \\ 
+prbpris & 91 & 0.411 & 0.080 & 0.150 & 0.365 & 0.457 & 0.600 \\ 
+avgsen & 91 & 9.647 & 2.847 & 5.380 & 7.340 & 11.420 & 20.700 \\ 
+polpc & 91 & 0.002 & 0.001 & 0.001 & 0.001 & 0.002 & 0.009 \\ 
+density & 91 & 1.429 & 1.514 & 0.00002 & 0.547 & 1.568 & 8.828 \\ 
+taxpc & 91 & 38.055 & 13.078 & 25.693 & 30.662 & 40.948 & 119.761 \\ 
+west & 91 & 0.253 & 0.437 & 0.000 & 0.000 & 0.500 & 1.000 \\ 
+central & 91 & 0.374 & 0.486 & 0.000 & 0.000 & 1.000 & 1.000 \\ 
+urban & 91 & 0.088 & 0.285 & 0.000 & 0.000 & 0.000 & 1.000 \\ 
+pctmin80 & 91 & 25.495 & 17.017 & 1.284 & 9.845 & 38.142 & 64.348 \\ 
+wcon & 91 & 285.358 & 47.487 & 193.643 & 250.782 & 314.795 & 436.767 \\ 
+wtuc & 91 & 411.668 & 77.266 & 187.617 & 374.632 & 443.436 & 613.226 \\ 
+wtrd & 91 & 211.553 & 34.216 & 154.209 & 190.864 & 225.126 & 354.676 \\ 
+wfir & 91 & 322.098 & 53.890 & 170.940 & 286.527 & 345.354 & 509.466 \\ 
+wser & 91 & 275.564 & 206.251 & 133.043 & 229.662 & 280.541 & 2,177.068 \\ 
+wmfg & 91 & 335.589 & 87.841 & 157.410 & 288.875 & 359.580 & 646.850 \\ 
+wfed & 91 & 442.901 & 59.678 & 326.100 & 400.240 & 478.030 & 597.950 \\ 
+wsta & 91 & 357.522 & 43.103 & 258.330 & 329.325 & 382.590 & 499.590 \\ 
+wloc & 91 & 312.681 & 28.235 & 239.170 & 297.265 & 329.250 & 388.090 \\ 
+mix & 91 & 0.129 & 0.081 & 0.020 & 0.081 & 0.152 & 0.465 \\ 
+pctymle & 91 & 0.084 & 0.023 & 0.062 & 0.074 & 0.083 & 0.249 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Pctl(25)} & \multicolumn{1}{c}{Pctl(75)} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+prbarr & 91 & 0.295 & 0.137 & 0.093 & 0.206 & 0.344 & 1.091 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Pctl(25)} & \multicolumn{1}{c}{Pctl(75)} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
 
 
-* CLM Assumption Plots
+* CLM Diagnostic Plots
 ```{r, fig.height=3.25, fig.width=4.5, fig.cap="Baseline Models Residuals vs Fitted Values Plot", echo=TRUE, message=FALSE}
 ggplot(crime, aes(x=model.1$fitted.values, y=model.1$residuals)) +
   geom_point() +
