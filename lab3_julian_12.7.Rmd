@@ -257,8 +257,9 @@ Endogeneity of probability of arrest:
 
 ### Future Model Specifications
 * To combat the biases that may have arisen from omitting the aforementioned variables, we will proceed by fitting new models with some variables to mitigate these potential biases. After inclusion of additional explanatory regressors, we will evaluate how the effects of the key variables we identified in our basline model have changed and whether or not they are still statistically significant.
-* In our first subsequent model iteration, we only include the variables which we believe would contribute the most to a mitigation of omitted variable bias. These variables include the urban indicator variable `urban`, the police per capita metric variable `polpc`. We also choose to include the variable `pctymle`
-* Then, a following iteration of our model including controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`.
+* In our first subsequent model iteration, we only include the variables which we believe would contribute the most to a mitigation of omitted variable bias. These variables include the urban indicator variable, `urban`, the police per capita metric variable, `polpc`. We also choose to include the variable `pctymle`
+* Then, a following iteration of our model includes controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`.
+* Lastly, a final iteration of our model controls for economic conditions by including wage variables and the tax per capita variable, `taxpc`.
 
 \newpage
 
