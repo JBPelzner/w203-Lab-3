@@ -9,9 +9,9 @@ output:
 
 ## Introduction
 
-Understanding what causes crime is an age-long question that is well studied in economic literature. This report aims to contribute to the discussion through an analysis of crime rates within counties in North Carolina in 1987. The data we analyze contains information about crime rates and various socioeconomic, geographic and demographic factors at the county level for 91 of North Carolina's 100 counties.
+Understanding the determinants of crime is an age-long question that is well studied in economic literature. This report aims to contribute to the discussion through an analysis of crime rates within counties in North Carolina in 1987. The data we analyze contains information about crime rates and various socioeconomic, geographic and demographic factors at the county level for 91 of North Carolina's 100 counties.
 
-This study was conducted for the reelection campaign of the Governor of North Carolina. Political consultants have identified crime as a primary voter initiative. Through our analysis we seek to understand how effective increased penalization is at combating crime and how the living conditions within a county affect instances of crime.
+This study was conducted for the reelection campaign of the governor of North Carolina. Political consultants have identified crime as a primary voter initiative. Through our analysis we seek to understand how effective increased penalization is at combating crime and how the living conditions within a county affect instances of crime.
 
 In this report, we provide an analysis that illuminates the determinants of crime, and we suggest policy actions that can be implemented at the local government level. The report is structured as follows:
 
@@ -23,10 +23,10 @@ In this report, we provide an analysis that illuminates the determinants of crim
 
 ## Data Cleaning
 
-Exploration of the dataset for data validity uncovered the following problems, which we addressed accordingly. After these changes, the data were vetted and ready for analysis.
+Exploration of the dataset for data validity uncovered the several problems with, after addressing which, the data were vetted and ready for analysis.
 
 * 6 of the original 97 rows have all values missing. We eliminated such rows from the dataset before analysis.
-* The `prbconv` variable, representing the ratio of convictions to arrests in a given county, was registered as a factor. In repsonse, we cast the probability of conviction column as a numeric variable.
+* The `prbconv` variable, representing the ratio of convictions to arrests in a given county, was registered as a factor. In repsonse, we cast probability of conviction as a numeric variable.
 * Examination of the distribution summary table uncovered that all of the data appeared within expected bounds with the exception of `prbarr`, a variable representing the probability of arrest in a given county, because the maximum value belonging to this variable is $>1$, outside the bounds of a probability. To address this we took the following course of action:
 
 \vspace{6pt}
@@ -99,17 +99,17 @@ crime <- crime[crime$prbarr <= 1.0, ]
 
 ### Variable Selection
 
-In this analysis, we seek to understand the extent to which penalizing criminal activity and living conditions interact with crime. It is necessary to choose variables representing all of the concepts we wish to study. Among all the variables in the dataset we select `crmrte`, representing the number of crimes committed per person in a given county, as the dependent variable used to measure crime. We also select `prbarr`, representing the ratio of arrests to total offenses, also known as the probability of arrest, as a proxy for measuring counties' efforts to penalize crime on the street level. 
+In this analysis, we seek to understand the extent to which penalizing criminal activity and living conditions interact with crime, and it is therefore necessary to choose variables representing all of these concepts. Among all the variables in the dataset we select `crmrte`, representing the number of crimes committed per person in a given county, as the dependent variable used to measure crime. We also select `prbarr`, representing the ratio of arrests to total offenses, also known as the probability of arrest, as a proxy for measuring counties' efforts to penalize crime on the street level. 
 
 While there are other variables in the data which can argualy proxy counties' efforts to penalize crime, such as the probability of conviction (after arrest), the probability of imprisonment (after conviction), and the average prison sentence length, we choose probability of arrest because it is the most tangible form of penalty among all those available and the also first opportunity for a legal institution to prosecute an offender. Apprehension is a county's immediate response to a criminal's offense and is necessary before the criminal can experince any other ensuing forms of penalty. Additionally, because prison sentence is a metric only based on crimes serious enough to warrant imprisonment, it does not reflect a county's effort to penalize all crimes but only the most serious subset of them. Therefore, we consider the probability of arrest to be the strongest proxy for crime penalization that is most likely to deter a criminal from committing an offense. In addition, a higher probability of arrest could indicate that the police are more effective at detaining people who commit crimes in the county.
 
-Moreover, we hypothesize that an increased likelihood of arrest stifles crime rates, because if criminals are less likely to escape punishment after committing offenses, we argue that this will make them less inclined to commit the offense in the very first place. 
+Moreover, we hypothesize that an increased likelihood of arrest stifles crime rates, because if criminals are less likely to escape punishment after committing offenses, we argue that this will make them less inclined to commit offenses in the very first place. 
 
 The variable of interest we identify as most relevant to a county's living conditions is `density`, representing the the number of people per square mile. We hypothesize that higher population density leads to an increase in crime rate for two main reasons:
 
 1. In a county with a high population density, there are more vulnerable denizens per square mile for criminals to perpetrate crimes against than there there are in a county with lower density.
 
-2. Prior research suggests that denser areas tend to make people more irritable due to increased economic competition and lack of living comfortability, thus making people in these denser areas more likely to act out through criminal behavior.
+2. Prior research suggests that denser areas tend to make people more irritable due to increased economic competition and lack of living comfortability, thus making people in denser areas more likely to act out through criminal behavior.
 
 In summary, the key explanatory variables in our baseline model will be probability of arrest and density. The next figure shows the marginal distributions of crime rate and both key explanatory variables.
 
@@ -134,7 +134,7 @@ plot.density = ggplot(crime, aes(x=density)) +
 grid.arrange(plot.crime, plot.arrest, plot.density, nrow = 1, ncol = 3)
 ```
 
-Each distribution has some right skew and a couple outliers. While this displays that the data is not perfectly normal, it is not enough to warrant not using the data.
+Each distribution has some right skew and a couple outliers. This means that some observations may have high leverage over a linear regression. Examination of bivariate scatter plots will alert us to whether any of the leverage is problematic.
 
 \vspace{6pt}
 
@@ -175,9 +175,9 @@ grid.arrange(p1, p2, p3, p4, nrow = 2, ncol = 2)
 
 \vspace{6pt}
 
-The set of plots above compares the scatter plots of crime rate with each primary explanatory variable and the scatter plots of log-crime rate with the same variables. It appears that the untransformed specifications have the strongest linear relationship with crime rate, so we will specifiy our baseline model without transforming crime rate. Refraining from transforming the response variable will enable us to directly interpret the model coefficients as the associated changes in crime rate for a single unit increase in each explanatory variable.
+The set of plots above compares the scatter plots of crime rate with each primary explanatory variable and the scatter plots of log-crime rate with the same variables. It appears that the untransformed specifications have the strongest linear relationship with crime rate, so we will specifiy our baseline model without transforming crime rate. Refraining from transforming the response variable will enable us to directly interpret the model coefficients as the associated changes in crime rate for a single unit increases in each explanatory variable. Additionally, none of the points currently appear to have problematically high influence.
 
-The first scatter plot illustrates that likelihood of arrest has a negative correlation with crime rate, supporting our hypothesis that increasing crackdown on crime is associated with a lower crime rate. The second plot supports our second hypothesis that increases in popualation density are associated with increased crime rates. 
+The first scatter plot illustrates that likelihood of arrest has a negative correlation with crime rate, supporting our hypothesis that increasing crackdown on crime is associated with a lower crime rate. The second plot supports our second hypothesis that increases in popualation density are associated with increased crime rates. We will proceed to big a regression model which regresses crime rate on probability of arrest and density to precisely understand their relationships.
 
 ## Baseline Model Specification. 
 
@@ -195,27 +195,27 @@ model.1 <- lm(crmrte ~ prbarr + density, data=crime)
 
 1. **Linearity**
 
-> After our bivariate exploratory analyses of crime rate with probability of arrest and crime rate with density, we chose the specification offering relationships that appear linear. However, we can argue that the model is linear no matter what because we have not yet constrained $\epsilon$.
+> After our bivariate exploratory analyses of crime rate with probability of arrest and crime rate with density, we chose the specification offering relationships that appear linear. However, we can argue that the model is linear nonetheless because we have not yet constrained $\epsilon$.
 
 2. **Random Sampling**
 
-> We can infer that because there are 97 data points, out of 100 possible counties in the state, that the researchers intended to complete a census of the population of counties in the state. However, because data from a few counties was inaccessible, they limited the study to a convenience sample of the remaining counties. Since over 5% of the population was sampled, we can not reasonably argue that the data was collected from a random sample. Nonetheless, with over 90% of counties in the state represented, we can conclude that the results of our models will offer useful insights into the causal factors behind crime rate on a statewide level. We assume that the inavailability of data in some counties is not connected to the crime rates therein in any significant way.
+> We can infer that because there are 91 data points, out of 100 possible counties in the state, that the researchers intended to complete a census of the population of counties in the state. However, because data from a few counties was inaccessible, they limited the study to a convenience sample of the remaining counties. Nonetheless, while the counties represent in the dataset don't form a fully random sample, since over 90% of counties in the state represented, we conclude that the results of our analysis will still offer useful insights into the causal factors behind crime rate at the county level. We assume that the inavailability of data in some counties is not connected to the crime rates therein in any important way.
 
 3. **Multicollinearity** 
 
-> To test for multicollinearity, we have calculated the inflated variance factors for all of the regressors in the first model. The variance inflation factors for both probability of arrest and density are `r round(car::vif(model.1), 2)` respectively, each of which is close to 1, so there is no problematic multicollinearity and, therefore, no perfect multicollinearity.
+> To test for multicollinearity, we have calculated the inflated variance factors for both regressors in the first model. The variance inflation factors for both probability of arrest and density are `r round(car::vif(model.1), 2)` respectively, each of which is close to 1, so there is no problematic multicollinearity and, therefore, no perfect multicollinearity.
 
 4. **Zero Conditional Mean**
 
 > To examine the zero conditional mean assumption, we have plotted the residuals as a function of the fitted values. By inspection of the residuals vs fitted values plot (see Appendix), there is not substantial evidence of violation of the zero conditional mean assumption. The conditional mean remains close to zero but tends downward slightly as the fitted values increase. 
 
-5. **Heteroscadascity**
+5. **Homoscadascity**
 
-> By examination of the residuals vs fitted values plot (see Appendix), there appears to some degree of heteroscedasticity because the magnitude of the residuals taper off at both the highest and lowest fitted values. To address this, we will use heteroscedasticty robust standard errors when making inferences. 
+> By examination of the residuals vs fitted values plot (see Appendix), there appears to some degree of heteroscedasticity because the magnitude of the residuals tapers off at both the highest and lowest fitted values. To address this, we will use heteroscedasticty robust standard errors when making inferences. 
 
 6. **Normality of Errors**
 
-> By inspection of the residuals' normal Q-Q plot and their distribution (see Appendix), the error distribution suffers from a fat right tail and a short left tail. While this means the error distribution deviates from normality somewhat, the sample size of `r nrow(crime)`, which is far greater than 30, enables us to confidently invoke the central limit theorem and conclude that in spite of the errors' non-normality, we approximate the sampling distributions of the model's coefficients.
+> By inspection of the residuals' normal Q-Q plot and their distribution (see Appendix), the error distribution suffers from a fat right tail and a short left tail. While this means the error distribution deviates from normality, the sample size of `r nrow(crime)`, which is far greater than 30, enables us to confidently invoke the central limit theorem and conclude that in spite of the errors' non-normality, we can still approximate the sampling distributions of the model's coefficients and make sound inferences about them.
 
 
 ### Model Results
@@ -227,20 +227,13 @@ Similary, density's coefficient of 0.008 suggests that in the same county as the
 
 ### Assessing Exogeneity
 
-$$ 
-\begin{aligned}
-response &= \beta_{interest} interest + \beta_{omitted}omitted\\
-omitted &= \delta_{interest} interest + ... \\
-sign(bias) &=  sign(\beta_{omitted} \times \delta_{interest}) 
-\end{aligned}
-$$
-### Exogeneity of density:
+#### Exogeneity of density:
 
 Plausible ommitted variables that may have biased the effect of density include the following:
 
 * Whether a county is urban
 
-> Urban localities are known for having crime rates than suburban and rural areas and they are also more dense. Therefore the omission of this variable is likley to have biased the effect of density on crime rate upward from zero. Because `urban` is an indicator variable in the dataset for whether a county is urban, we can control for this omitted variable directly by including urban in subsequent regression models.
+> Urban localities are known for having higher crime rates than suburban and rural areas and they are also more dense. Therefore the omission of this variable is likley to have biased the effect of density on crime rate upward from zero. Because `urban` is an indicator variable in the dataset for whether a county is urban, we can control for this omitted variable directly by including urban in subsequent regression models.
 
 * Economic inequality
 
@@ -248,14 +241,14 @@ Plausible ommitted variables that may have biased the effect of density include 
 
 * Social Cohesion.
 
-> Social cohesion is likely to be negatively correlated with density. In other words, denser areas may experience higher rates of competition, which can cause distrust and social unrest. In addition, social cohesion is likely to be negatively correlated with crime rate. We expect that the more cohesive a society (county) is, the lower its crime rate will be. Thus, the omission of this variable is likely to have biased the effect of density on crime rate upwards away from zero.  However, metrics for this concepts do not exist in the given dataset. To that end, future work should strive to collect more data on these metrics. Useful metrics could include level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. 
+> Social cohesion is likely to be negatively correlated with density. In other words, denser areas may experience higher rates of competition, which can cause distrust and social unrest. In addition, social cohesion is likely to be negatively correlated with crime rate. We expect that the more cohesive a society (county) is, the lower its crime rate will be. Thus, the omission of this variable is likely to have biased the effect of density on crime rate upwards away from zero.  However, metrics for this concepts do not exist in the given dataset. To that end, future work should strive to collect more data related to social cohesion. Useful metrics could include level of neighbor trust, and rates of  riots, protests, and other forms of social unrest. 
 
 * Geographic region
 
-> There may be varying levels of crime based on the region in North Carolina in which a county is located. It is difficult to postulate the sign of correlation between region and density, or between region and crime rate, and therefore it is difficult to postulate the direction of the bias from the omission of this variable. Nonetheless, it is a relevant concept which should be controlled for in our analysis. Fortunately, there exists west and central dummy variables, which proxy geographic regions in North Carolina. 
+> There may be varying levels of crime based on the region in North Carolina in which counties are located. It is difficult to postulate the sign of correlation between region and density, or between region and crime rate, and therefore it is difficult to postulate the direction of the bias results from the omission of this variable. Nonetheless, it is a relevant concept which should be controlled for in our analysis. Fortunately, there are west and central dummy variables in the dataset, which proxy geographic factors in different parts of North Carolina. 
   
 
-### Exogeneity of probability of arrest:
+#### Exogeneity of probability of arrest:
 
 Plausible ommitted variables that may have biased the effect of probability of arrest include the following:
 
@@ -265,17 +258,19 @@ Plausible ommitted variables that may have biased the effect of probability of a
 
 * Harshness of police force
 
-> We reason that the harshness of a county's police force is negatively correlated with the crime rate in that county and positively correlated with the probability of arrest in that county. Therefore, omission of this variable from our model would suggest that the effect of probability of arrest on crime rate is biased downwards away from zero. Metrics for this concept do not exist in the given dataset either. Useful metrics could include rate of violent arrests and the degree to which police are armed with weapons. To that end, future work should strive to collect more data on these metrics.  
+> We reason that the harshness of a county's police force is negatively correlated with the crime rate in that county and positively correlated with the probability of arrest in that county. Therefore, omission of this variable from our model would suggest that the effect of probability of arrest on crime rate is biased downwards away from zero. Metrics for this concept do not exist in the given dataset either. Useful metrics could include rate of violent arrests and the degree to which police are armed with weapons. To that end, future work should strive to collect more data measuring the harshness of police forces.  
 
 * Proportion of face-to-face crimes
 
-> In this context, we are thinking about variety of offenses in the sense that some counties may have a mix of offenses which contain a higher proportion of personal or face-to-face crimes than others. We theorize that the proportion of face-to-face crimes is positively correlated with probability of arrest, because these crimes are generally more serious in nature and could provide victims with descriptions of suspects that can be utilized by the police. Additionally, we reason that proportion of face-to-face crimes is positively correlated with crime rate. Therefore, omission of this variable would lead to the effect of probability of arrest on crime rate being pushed upwards towards zero. In the dataset, we have the variable `mix`, which directly represents the proportion of face-to-face offenses in the dataset.
+> In this context, we are thinking about variety of offenses in the sense that some counties may have a mix of offenses which contain a higher proportion of personal or face-to-face crimes relative to other counties. We theorize that the proportion of face-to-face crimes is positively correlated with probability of arrest, because these crimes are generally more serious in nature and could provide victims with descriptions of suspects which are o great police when searching for criminals. Additionally, we reason that proportion of face-to-face crimes is positively correlated with crime rate. Therefore, omission of this variable would has biased the effect of probability of arrest on crime rate upwards towards zero. The dataset includes the variable `mix`, which directly represents the proportion of face-to-face offenses in the dataset, and we will use it to control for the proportino of face-to-face offenses.
 
 
 ### Future Model Specifications
-* To combat the biases that may have arisen from omitting the aforementioned variables, we will proceed by fitting new models which control for particular omitted variables. After including the control, we will evaluate the robustness of the effects observed in the baseline regression.
-* In our first subsequent model iteration, we only include the variables which we believe would contribute the most to a mitigation of omitted variable bias. These variables include the urban indicator variable, `urban`, the police per capita metric variable, `polpc`, as well as the offense mix proportion variable, `mix`.
-* Then, a following iteration of our model includes controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`. Additionally, this iteration of our model controls for economic conditions by including wage variables and the tax per capita variable, `taxpc`. Furthermore, we decide to include the variable `pctymle`, which describes the percentage of young males under the age of 24 that reside in a given county, because young men are the most fit demographic for committing face-to-face crimes.
+ To combat the biases that may have arisen from omitting the aforementioned variables, we will proceed by fitting new models which control for particular omitted variables. After including the controls, we will evaluate the robustness of the effects observed in the baseline regression. We will proceed to train the following two regressions using controls:
+ 
+1. In our first subsequent regression model, we only include the variables which we believe would contribute the most to mitigating omitted variable biases. These variables include the urban indicator variable, `urban`, the police per capita metric variable, `polpc`, as well as the offense mix proportion variable, `mix`.
+
+2. The final iteration of our model includes controls for geographic fixed effects, utilizing the regional indicator variables `west` and `central`. Additionally, this iteration of our model controls for economic conditions by including wage variables and the tax per capita variable, `taxpc`. Furthermore, we decide to include the variable `pctymle`, which describes the percentage of young males under the age of 24 that reside in a given county, because young men are the most fit demographic for committing face-to-face crimes.
 
 \newpage
 
@@ -326,9 +321,9 @@ $$
 and $W$ are the columns of the dataset pertaining to wage, geographic and demogaphic factors
 
 ## Regression Summaries
-We reference the stargazer table below (Table 1) to display the results of our regression models. After fitting regression which control for ommitted variabbles, our findings are as follows:
+We reference the stargazer table below (Table 1) to display the results of all three regression models. After fitting regressions which control for ommitted variabbles, our findings are as follows:
 
-Throughout all threem model specifications, `prbarr` and `density`, remain statistically significant and their coefficient estimates remain relatively stable. Therefore, the previous interpretation of the coefficients from our baseline model is still valid and we will generate policy recommendations with regards to those two key explanatory variables. However, characteristics of the key regressors were not assigned randomly to the counties in the dataset, so we can not definitively conclude that these variables were the true causes of any observed differences in crime rates. However, the coefficients are robust against economic, geographic and demographic omitted variables, which provides strong evidence that density and probability of arrest have causal effects on crime. Additionally, the Adjusted $R^2$ value increases for each specification, which suggests that the controls we introduced accounted for some of the variation in our response variable and were important to include. 
+Throughout all three specifications, `prbarr` and `density` remain statistically significant and their coefficient estimates remain relatively stable. Therefore, the previous interpretation of the coefficients from our baseline model is still valid and we will generate policy recommendations with regards to those two key explanatory variables. However, characteristics of the key regressors were not assigned randomly to the counties in the dataset, so we can not definitively conclude that these variables were the true causes of any observed differences in crime rates. Nonetheless, the roustness of the coefficients to controlling for geographic, economic and demographic factors provides strong evidence that density and probability of arrest have causal effects on crime. Additionally, the Adjusted $R^2$ value increases for each specification, which suggests that the controls we introduced accounted for some of the variation in our response variable and were important to include. 
 
 It is also worth noting that in the thrid specification that the percent young male variable (`pctymle`) has a signigicant positive effect at the 5% level. Besides percent young male, none of the additional regressors associated with the third model are statistically significant. However, the significance of `pctymle` suggests that this variable is relevant to crime rates and we take it into account when considering policy recommendations.
 
@@ -396,15 +391,15 @@ Residual Std. Error & 0.013 (df = 87) & 0.012 (df = 85) & 0.010 (df = 70) \\
 ### Recommendations
 Based on our findings, we have 2 major recommendations for policies that could be implemented in counties across North Carolina to reduce crime: allowing stop-and-frisk procedures by local police forces, and funding more community centers and programs for the youth.
 
-We recommend that the governor should collaborate with the state and local governments and their police departments to enact and implement a stop-and-frisk policy. This crime penalization policy would effectively provide police forces with the efficacy to increase the probability of arrest in their jurisdictions. Considering that this dataset provides evidence that a higher probability of arrest is related to a decrease in crime rates, we reason that a policy enabling police to stop and frisk locals will result reduction in crime. Next steps involve consulting state, city, and district attorneys and police chiefs to craft a series of internal policies and bills that will support law enforcement in these efforts. Furthermore, in an effort to preempt any racial bias concerns, we suggest that police forces undergo a series of mandatory implicit bias trainings.
+We recommend that the governor should collaborate with the state and local governments and their police departments to enact and implement a stop-and-frisk policy. This crime penalization policy would effectively provide police forces with the ability to increase the probability of arrest in their jurisdictions. Considering that this dataset provides evidence that a higher probability of arrest is related to a decrease in crime rates, we reason that a policy enabling police to stop and frisk locals will result in a noticeable reduction in crime. Next steps involve consulting state, city, and district attorneys and police chiefs to craft a series of internal policies and bills that will support law enforcement in these efforts. Furthermore, in an effort to preempt any racial bias concerns, we suggest that police forces undergo a series of mandatory implicit bias trainings as well.
 
 We also recommend that the governor fund community building programs throughout the state, especially for the youth. This policy is aimed as ameliorating issues associated with social cohesion and economic opportunity as they pertain to living conditions. Supporting youth organizations and community centers are major components of building positive social networks and reducing crime rates. Given that the dataset provided evidence of a connection between a large propotion of of young male in a given county to higher crime rates, it behooves policy makers to invest in ther success by providing them mentorship and career-building support. The governor should rally support among statewide and citywide legislatures to ensure these laws can be passed and implemented in a timely fashion. 
 
 
 ### Conclusion
-This study explored the effects of penilization of criminality and density on crime. Through a regression analysis, we found that the probability of arrest, density, and percentage of youth males are features of a county that are most significantly related to a county's crime rate. Specifically, a regression analysis controlling for economic, geographic and demogrphic factors showed that while density and percentage of young males are positively are positively correlated with crime rate, higher chance of arrest is expected to decrease crime rate. According these results, we base our policy recommendations around these factors. 
+This study explored the effects of density and penilization of criminality on crime. Through a regression analysis, we found that a county's probability of arrest, density, and percentage of youth males are characteristics that are significantly related to it's crime rate. Specifically, a regression analysis controlling for economic, geographic and demogrphic factors showed that while density and percentage of young males are positively are positively correlated with crime rate, higher chance of arrest is expected to decrease crime rate. 
 
-We suggest that probability of arrest can be strengthened by implementation of more aggressive policing policies such as a stop-and-frisk procedure. However, counties' densities can not easily be lowered after the fact, so we defer any policy suggestions related to population density. Additionally, we encourage investment in community resources and youth programs so that young people have more guidance are less likely to enage in criminal behavior. 
+According these results, we generated policy recommendations for the re-election campaign of North Carolina's governor. We suggest that probability of arrest can be strengthened by implementing more aggressive policing policies such as a stop-and-frisk procedure. However, counties' densities can not easily be lowered after the fact, so we defer any policy suggestions related to population density. Additionally, we encourage investment in community resources and youth programs so that young people have more guidance are less likely to enage in criminal behavior. 
 
 \newpage
 
